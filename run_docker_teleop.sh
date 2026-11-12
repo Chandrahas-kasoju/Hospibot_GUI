@@ -2,7 +2,7 @@
 # /home/hospibot/run_docker_teleop.sh
 
 echo "--- HOSPIBOT TELEOP LAUNCHER ---"
-cd /home/hospibot/hospibot_docker
+cd /home/hospibot/Body_docker
 
 # 1. Start Docker
 echo "Starting Docker Compose..."
@@ -12,7 +12,8 @@ echo "Starting Docker Compose..."
 # IMPORTANT CHANGE: We added 'source install/setup.bash' below
 echo "Entering Container..."
 
-docker exec -it hospibot_container bash -c "source /opt/ros/humble/setup.bash && source install/setup.bash && ros2 launch body_bringup body_bringup.launch.py"
+docker exec -it hospibot_container bash -c "source /etc/turtlebot4/setup.bash && source install/setup.bash && ros2 launch body_bringup body_bringup.launch.py"
+
 # 3. Keep window open
 
 echo "Teleop process ended."

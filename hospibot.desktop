@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Hospibot Auto Start
+Comment=Start hospibot GUI and Docker Teleop on login
+# POINT THIS TO YOUR NEW SCRIPT
+Exec=/home/hospibot/start_hospibot.sh
+WorkingDirectory=/home/hospibot
+Terminal=false
+X-GNOME-Autostart-enabled=true

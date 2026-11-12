@@ -93,6 +93,7 @@ def browser_worker():
 
                 launch_args = [
                     f"--app={TEAMS_URL}",
+                    #"--kiosk",
                     "--start-fullscreen", 
                     "--no-default-browser-check",
                     "--force-device-scale-factor=0.93",
@@ -302,6 +303,9 @@ class HospibotGUI:
         self.frame = tk.Frame(root, bg="#0b132b")
         self.frame.pack(expand=True, fill="both")
 
+        self.inner_frame = tk.Frame(self.frame, bg="#0b132b")
+        self.inner_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
         # --- EXIT BUTTON RESTORED HERE ---
         self.exit_btn = tk.Button(root, text="EXIT", font=("Arial", 10), command=self.close_app, bg="red", fg="white")
         self.exit_btn.place(x=0, y=0)
@@ -309,14 +313,14 @@ class HospibotGUI:
         # Escape key kept as backup
         self.root.bind("<Escape>", lambda event: self.close_app())
 
-        tk.Label(self.frame, text="Hospibot: Call Doctor", font=("Helvetica", 30, "bold"), fg="white", bg="#0b132b").pack(pady=60)
+        tk.Label(self.inner_frame, text="Call for Assistance", font=("Helvetica", 50, "bold"), fg="white", bg="#0b132b").pack(pady=60)
 
         self.status_var = tk.StringVar(value="Initializing Pi System...")
-        self.lbl_status = tk.Label(self.frame, textvariable=self.status_var, font=("Helvetica", 16), fg="#aaaaaa", bg="#0b132b")
+        self.lbl_status = tk.Label(self.inner_frame, textvariable=self.status_var, font=("Helvetica", 16), fg="#aaaaaa", bg="#0b132b")
         
         self.btn = tk.Button(
-            self.frame, text="System Loading...", font=("Helvetica", 24, "bold"),
-            bg="#333333", fg="white", padx=50, pady=30, relief="raised", bd=5,
+            self.inner_frame, text="System Loading...", font=("Helvetica", 36, "bold"),
+            bg="#333333", fg="white", padx=80, pady=40, relief="raised", bd=5,
             state="disabled", command=self.on_call_click
         )
         self.btn.pack(pady=20)
