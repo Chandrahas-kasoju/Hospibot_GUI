@@ -16,6 +16,7 @@ TEAMS_URL = "https://teams.microsoft.com"
 USER_DATA_DIR = "/home/hospibot/hospibot_ws/doctortrial/teams_profile_pi"
 # Tele's mode manager runs in the ROS container and listens on this local address
 MODE_URL = "http://127.0.0.1:8011/mode"
+ABOUT_URL = "http://127.0.0.1:8011/about"
 
 # --- Global Queues ---
 command_queue = queue.Queue()
@@ -296,7 +297,7 @@ def _internal_perform_call(page):
 # --- GUI CLASS ---
 
 class HospibotGUI:
-    """Three screens: a menu (Patrol Mode / Christmas Mode), the call screen, and the Christmas screen."""
+    """Three screens: a menu (Patrol Mode / Christmas Mode / About Me), the call screen, and the Christmas screen."""
 
     BG = "#0b132b"
 
@@ -339,13 +340,19 @@ class HospibotGUI:
         tk.Button(
             box, text="Patrol Mode", font=("Helvetica", 44, "bold"), width=14,
             bg="#1f4068", activebackground="#2a5a94", fg="white", activeforeground="white",
-            pady=60, relief="raised", bd=5, command=self.on_patrol_click
-        ).pack(pady=40)
+            pady=50, relief="raised", bd=5, command=self.on_patrol_click
+        ).pack(pady=30)
         tk.Button(
             box, text="Christmas Mode", font=("Helvetica", 44, "bold"), width=14,
             bg="#b3202a", activebackground="#d32f3a", fg="white", activeforeground="white",
-            pady=60, relief="raised", bd=5, command=self.on_christmas_click
-        ).pack(pady=40)
+            pady=50, relief="raised", bd=5, command=self.on_christmas_click
+        ).pack(pady=30)
+        self.about_btn = tk.Button(
+            box, text="About Me", font=("Helvetica", 44, "bold"), width=14,
+            bg="#0f7a7a", activebackground="#14a0a0", fg="white", activeforeground="white",
+            pady=50, relief="raised", bd=5, command=self.on_about_click
+        )
+        self.about_btn.pack(pady=30)
 
     def _build_patrol(self):
         self.patrol = tk.Frame(self.frame, bg=self.BG)
@@ -494,6 +501,21 @@ class HospibotGUI:
         self.mode = "CHRISTMAS"
         self.set_mode("CHRISTMAS")
         self.show_screen("christmas")
+
+    def on_about_click(self):
+        """Tele introduces itself out loud. The button waits until the speech is over."""
+        self.about_btn.config(state="disabled", text="Speaking...")
+
+        def ready():
+            self.about_btn.config(state="normal", text="About Me")
+
+        def work():
+            try:
+                seconds = float(requests.post(ABOUT_URL, timeout=3).json().get("seconds", 0))
+            except Exception:
+                seconds = 0
+            self.root.after(int(seconds * 1000) + 500, ready)
+        threading.Thread(target=work, daemon=True).start()
 
     def on_stop_christmas_click(self):
         self.mode = "PATROL"
