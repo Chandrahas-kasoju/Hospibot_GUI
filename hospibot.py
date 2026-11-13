@@ -419,7 +419,7 @@ class HospibotGUI:
             self.lights.append(c.create_oval(x - r, y * h - r, x + r, y * h + r, fill="#ffd54a", outline=""))
 
         # Santa's face
-        sx, sy, r = w * 0.5, h * 0.24, w * 0.14
+        sx, sy, r = w * 0.5, h * 0.27, w * 0.12
         c.create_oval(sx - r * 1.25, sy - r * 0.1, sx + r * 1.25, sy + r * 2.0, fill="white", outline="")       # Beard
         c.create_oval(sx - r, sy - r, sx + r, sy + r, fill="#f6c9a8", outline="")                              # Face
         c.create_polygon(sx - r * 1.05, sy - r * 0.55, sx + r * 1.05, sy - r * 0.55, sx + r * 0.75, sy - r * 2.1,
@@ -432,7 +432,7 @@ class HospibotGUI:
         c.create_oval(sx - r * 0.75, sy + r * 0.35, sx + r * 0.02, sy + r * 0.80, fill="white", outline="")    # Moustache
         c.create_oval(sx - r * 0.02, sy + r * 0.35, sx + r * 0.75, sy + r * 0.80, fill="white", outline="")
 
-        c.create_text(w * 0.5, h * 0.045, text="Merry Christmas!", font=("Helvetica", int(w * 0.085), "bold"), fill="#ffd54a")
+        c.create_text(w * 0.5, h * 0.075, text="Merry Christmas!", font=("Helvetica", int(w * 0.075), "bold"), fill="#ffd54a")
 
         for i in range(70):
             x, y, r = random.uniform(0, w), random.uniform(0, h), random.uniform(2, 5)
