@@ -13,6 +13,8 @@ from playwright.sync_api import sync_playwright
 # --- CONFIGURATION ---
 TEAMS_URL = "https://teams.microsoft.com"
 USER_DATA_DIR = "/home/hospibot/hospibot_ws/doctortrial/teams_profile_pi"
+# Tele's mode manager runs in the ROS container and listens on this local address
+MODE_URL = "http://127.0.0.1:8011/mode"
 
 # --- Global Queues ---
 command_queue = queue.Queue()
@@ -326,6 +328,17 @@ class HospibotGUI:
         self.btn.pack(pady=20)
         self.lbl_status.pack(pady=20)
 
+        # --- MODE BUTTON ---
+        # Switches Tele between Work mode and Christmas mode (lights, music, slow head sway)
+        self.mode = None
+        self.mode_btn = tk.Button(
+            self.inner_frame, text="Christmas Mode", font=("Helvetica", 24, "bold"),
+            bg="#333333", fg="white", padx=40, pady=20, relief="raised", bd=5,
+            state="disabled", command=self.on_mode_click
+        )
+        self.mode_btn.pack(pady=40)
+        self.root.after(1000, self.poll_mode)
+
         self.root.after(100, self.process_gui_queue)
         self.thread = threading.Thread(target=browser_worker, daemon=True)
         self.thread.start()
@@ -347,8 +360,45 @@ class HospibotGUI:
         except queue.Empty: pass
         self.root.after(100, self.process_gui_queue)
 
+    def show_mode(self, mode):
+        self.mode = mode
+        if mode == "CHRISTMAS":
+            self.mode_btn.config(state="normal", bg="#b3202a", activebackground="#d32f3a",
+                                 text="Christmas Mode is ON\nTap to stop")
+        elif mode == "WORK":
+            self.mode_btn.config(state="normal", bg="#1e7a3c", activebackground="#27a04f",
+                                 text="Christmas Mode")
+        else:
+            self.mode_btn.config(state="disabled", bg="#333333", text="Christmas Mode")
+
+    def poll_mode(self):
+        """Ask the mode manager for the current mode, without blocking the screen."""
+        def work():
+            try:
+                mode = requests.get(MODE_URL, timeout=1.5).json().get("mode")
+            except Exception:
+                mode = None
+            self.root.after(0, lambda: self.show_mode(mode))
+        threading.Thread(target=work, daemon=True).start()
+        self.root.after(2000, self.poll_mode)
+
+    def set_mode(self, mode):
+        def work():
+            try:
+                new_mode = requests.post(f"{MODE_URL}/{mode}", timeout=2).json().get("mode")
+            except Exception:
+                new_mode = None
+            self.root.after(0, lambda: self.show_mode(new_mode))
+        threading.Thread(target=work, daemon=True).start()
+
+    def on_mode_click(self):
+        self.mode_btn.config(state="disabled")
+        self.set_mode("WORK" if self.mode == "CHRISTMAS" else "CHRISTMAS")
+
     def on_call_click(self):
         self.btn.config(state="disabled", text="Calling...")
+        if self.mode == "CHRISTMAS":
+            self.set_mode("WORK")  # No music or head sway during a call
         self.status_var.set("Connecting...")
         command_queue.put("CALL")
 
